@@ -193,24 +193,24 @@ handle_ws_json_rpc(WSock, "message", Params, _Arg ) ->
     ?debug("service_edge_rpc:handle_websocket(~p) service:      ~p", [ WSock, SvcName ]),
     ?debug("service_edge_rpc:handle_websocket(~p) parameters:   ~p", [ WSock, Parameters ]),
 
-    [ Res, TID ] = gen_server:call(?SERVER, { rvi, handle_local_message, 
+    [ Res, TID ] = gen_server:call(?SERVER, { rvi, handle_local_message,
 					      [ SvcName, Timeout, [{struct, Parameters}]]}),
 
     ?debug("service_edge_rpc:wse_message(~p) Res:      ~p", [ WSock, Res ]),
-    { ok, [ { status, rvi_common:json_rpc_status(Res) }, 
+    { ok, [ { status, rvi_common:json_rpc_status(Res) },
 	    { transaction_id, TID} ] };
 
 handle_ws_json_rpc(WSock, "register_service", Params,_Arg ) ->
     { ok, SvcName } = rvi_common:get_json_element(["service_name"], Params),
     ?debug("service_edge_rpc:websocket_register(~p) service:     ~p", [ WSock, SvcName ]),
-    [ok, FullSvcName ] = gen_server:call(?SERVER, 
-					 { rvi, 
-					   register_local_service, 
-					   [ SvcName, 
+    [ok, FullSvcName ] = gen_server:call(?SERVER,
+					 { rvi,
+					   register_local_service,
+					   [ SvcName,
 					     "ws:" ++ pid_to_list(WSock)]}),
-    
-    { ok, [ { status, rvi_common:json_rpc_status(ok)}, 
-	    { service, FullSvcName }]};
+
+    { ok, [ { status, rvi_common:json_rpc_status(ok)},
+	    { service, FullSvcName } , { method, "register_service" } ]};
 
 handle_ws_json_rpc(WSock, "unregister_service", Params, _Arg ) ->
     { ok, SvcName } = rvi_common:get_json_element(["service_name"], Params),
@@ -232,11 +232,11 @@ handle_ws_json_rpc(_Ws , "get_available_services", _Params, _Arg ) ->
 handle_rpc("register_service", Args) ->
     {ok, SvcName} = rvi_common:get_json_element(["service"], Args),
     {ok, URL} = rvi_common:get_json_element(["network_address"], Args),
-    [ok, FullSvcName ] = gen_server:call(?SERVER, 
-					 { rvi, register_local_service, 
+    [ok, FullSvcName ] = gen_server:call(?SERVER,
+					 { rvi, register_local_service,
 					   [ SvcName, URL]}),
 
-    {ok, [ {status, rvi_common:json_rpc_status(ok) }, { service, FullSvcName }]};
+    {ok, [ {status, rvi_common:json_rpc_status(ok) }, { service, FullSvcName } , { method, "register_service" } ]};
 
 
 handle_rpc("unregister_service", Args) ->
