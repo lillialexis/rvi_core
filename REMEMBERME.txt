@@ -1,0 +1,113 @@
+********************* Invoking the credential script from ~/Android/HVACDemo/keystuff on Mac (but not working) ********************
+
+$ env LDFLAGS="-L$(brew --prefix openssl)/lib" CFLAGS="-I$(brew --prefix openssl)/include" ./rvi_create_credential.py \
+                           --cred_out="insecure_credential.json" \
+                           --jwt_out='insecure_credential.jwt' \
+                           --id="insecure_credentials" \
+                           --issuer="jlr.com" \
+                           --root_key=insecure_root_key.pem \
+                           --device_cert=insecure_device_cert.crt \
+                           --invoke='jlr.com/' \
+                           --register='jlr.com/'
+
+
+********************* Invoking the credential script from test3 in /home/rvi/uw_151207/rvi_core/scripts ********************
+
+$ ./rvi_create_credential.py --cred_out="insecure_credential.json" \
+                             --jwt_out='insecure_credential.jwt' \
+                             --id="insecure_credentials" \
+
+                             --issuer="jlr.com" \
+                             --root_key=../priv/sample_keys/insecure_root_key.pem \
+                             --device_cert=../priv/sample_certificates/insecure_device_cert.crt \
+                             --invoke='jlr.com/' \
+                             --register='jlr.com/'
+
+  *** With genivi.org, no '/' ***
+
+$ ./rvi_create_credential.py --cred_out="insecure_credential.json" \
+                             --jwt_out='insecure_credential.jwt' \
+                             --id="insecure_credentials" \
+                             --issuer="jlr.com" \
+                             --root_key=../priv/sample_keys/insecure_root_key.pem \
+                             --device_cert=../priv/sample_certificates/insecure_device_cert.crt \
+                             --invoke='genivi.org' \
+                             --register='genivi.org'
+
+
+
+********************** Building a node from currently-interesting-rvi_core-branch from /opt/rvi_core on Tizen box as root **************************************
+
+$ make
+$ ./scripts/rvi_install.sh <node_name>
+
+          ./scripts/rvi_install.sh lilli
+
+
+***** Then copy the right config file from /opt/rvi_core/rvi_lilli.config to newly build node *****
+
+$ cp /opt/rvi_core/rvi_lilli.config /opt/rvi_core/<node_name>/rvi_core/priv/config/rvi_lilli.config
+
+        cp /opt/rvi_core/rvi_lilli.config /opt/rvi_core/lilli/rvi_core/priv/config/rvi_lilli.config
+
+***** Then copy the right creds file from /opt/rvi_core/priv to newly build node *****
+
+$ cp /opt/rvi_core/priv/sample_credentials/insecure_credential.j* /opt/rvi_core/<node_name>/rvi_core/priv/sample_credentials/
+
+
+        cp /opt/rvi_core/priv/sample_credentials/insecure_credential.j* /opt/rvi_core/lilli/rvi_core/priv/sample_credentials/
+
+********************** Starting currently-interesting-rvi_core-branch from /opt/rvi_core/<node_name> on Tizen box as root **************************************
+
+$ RVI_LOGLEVEL=debug ./rvi.sh -c ./rvi_core/priv/config/rvi_lilli.config -d `pwd` -l `pwd`/rvi/log
+
+
+
+
+
+
+
+
+
+
+********************** New instructions for starting rvi on Tizen box as root as of 8/2/2016 **************************************
+
+
+$ mkdir lilli_<date>
+$ mkdir lilli_<date>/rvi_core
+$ ./scripts/rvi_install -r priv/certificates/insecure_root_cert.crt -d priv/certificates/insecure_device_cert.crt -k priv/keys/insecure_device_key.pem -c priv/credentials/insecure_credential.jwt lilli_2016-08-02/rvi_core/
+$ /opt/rvi_core/lilli_2016-08-02/rvi_core/rvi_ctl -c <config_file> console
+
+(seems to work for iOS too!)
+
+
+
+
+
+
+
+
+
+********************** Test server IP addrs and ssh commands **********************
+
+38.129.64.31 	test1 # maybe
+38.129.64.40 	test2
+38.129.64.41 	test3
+38.129.64.42 	test4
+
+$ ssh -p1066 <afan1/rvi>@38.129.64.<31/40/41/42>
+
+
+
+********************** Python scripts syntax **********************
+
+
+./rvi_core/python/rvi_get_services.py http://localhost:8811
+
+
+
+
+********************** URLs **********************
+
+http://rvi-test2.nginfotpdx.net:8000/admin/login/?next=/admin/devices/remote/
+http://192.168.16.132:9222/
